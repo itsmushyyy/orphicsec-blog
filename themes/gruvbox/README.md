@@ -40,7 +40,6 @@ disqusShortname = ""
   postTruncateLength = 250
   hideGopher = false
   disqusAutoLoad = false
-  disqusAutoLoadCount = false
 
 [[menu.links]]
   name = "CV"
