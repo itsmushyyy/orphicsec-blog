@@ -23,16 +23,33 @@
       background: #393E41;
       color: white;
     }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+}
 
-    table {
-      margin: auto;
-      border-top: 1px solid #666;
-      border-bottom: 1px solid #666;
-    }
-    table thead th { border-bottom: 1px solid #666; }
-    th, td { padding: 5px; }
-    tr:nth-child(even) { background: #666 }
+td, th {
+    padding: 0.5rem;
+    border: 1px solid #222;
+    text-align: left;
+    background: #000000;
+}
 
+th {
+    background: #0a0a0a;
+    font-weight: 600;
+}
+
+/* Remove zebra striping */
+tr {
+    background: #000000;
+}
+
+tbody tr:nth-child(even) {
+    background: #000000;
+}
 }
 
 
@@ -73,14 +90,20 @@
     }
 
     table {
-      margin: auto;
-      border-top: 1px solid #666;
-      border-bottom: 1px solid #666;
+      margin: 1.5rem 0;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.9rem;
     }
     table thead th { border-bottom: 1px solid #ddd; }
-    th, td { padding: 5px; }
-    tr:nth-child(even) { background: #eee }
-
+    td, th {
+      padding: 0.5rem;
+      border: 1px solid #222;
+      text-align: left;
+      background: #000000;
+    }
+    tr { background: #000000; }
+    tr:nth-child(even) { background: #000000 }
 }
 
 
