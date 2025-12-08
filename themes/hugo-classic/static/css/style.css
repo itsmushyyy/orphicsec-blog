@@ -16,7 +16,7 @@
     header {
       background: #393E41;
       border-bottom: 2px dotted #EBC3DB;
-
+      margin-bottom: 2rem;
     }
 
     .article-meta, .menu a {
@@ -38,21 +38,38 @@
 
 /* Light mode */
 @media (prefers-color-scheme: light) {
+    body {
+      background-color: #000000;
+      color: white;
+      line-height: 1.8;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+
     blockquote {
-      background: #f9f9f9;
+      background: #000000;
     }
 
     a {
-      color: #613DC1;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
 
     header {
-      background: #613DC1;
+      background: #000000;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #1a1a1a;
     }
 
     .article-meta, .menu a {
-      background: #E8DBC5;
-      color: #000;
+      background: #000000;
+      color: white;
     }
 
     table {
@@ -68,15 +85,16 @@
 
 
 body {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
   padding: .2em;
   line-height: 1.5em;
 }
 
-h1 {
-  line-height: 1.5em;
-}
+/* Typography hierarchy */
+h1 { font-size: 1.4rem; margin: 2rem 0 1rem; }
+h2 { font-size: 1.2rem; margin: 1.5rem 0 0.8rem; }
+h3 { font-size: 1.1rem; }
 
 /* Table of Contents, if wanted
 
@@ -142,6 +160,22 @@ header nav {
     padding: 0 0.5rem
 }
 
+nav a {
+    color: #888;
+    font-size: 0.95rem;
+    border: none;
+    transition: color 0.2s;
+}
+
+nav a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+nav a[href="/"] {
+    color: #fff;
+}
+
 header a {
     color: #fff;
     line-height: 1.75rem;
@@ -152,19 +186,30 @@ header .current a {
     color: #fff
 }
 
-/* Code Boxes */
+/* Code blocks */
 pre {
-  border: 2px solid #EBC3DB;
-  padding: 1em;
-  overflow-x: auto;
+    background: #0a0a0a;
+    border: 15px solid #1a1a1a;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-radius: 2px;
 }
-pre code { background: none; }
+
+pre code {
+    background: transparent;
+    color: #d4d4d4;
+    line-height: 1.6;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+}
 
 code {
-  background-color: light-dark(#D6D6D6, #888);
-  border-radius: 3px;
-  padding: 0.2em;
-  overflow-x: auto;
+    background: #1a1a1a;
+    color: #d4d4d4;
+    padding: 0.2rem 0.4rem;
+    border-radius: 2px;
+    font-size: 0.9rem;
 }
 
 /* Images, tables, misc. */
@@ -178,7 +223,7 @@ img, iframe, video {
 
 main {
   hyphens: auto;
-  max-width: 650px;
+  max-width: 900px;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.7em;
@@ -205,7 +250,6 @@ blockquote {
   padding: 10px;
   display: block;
 }
-
 
 #table-of-contents {
 }
@@ -237,3 +281,19 @@ blockquote {
     }
 }
 
+/* Remove borders and backgrounds */
+header, footer, nav {
+    border: none;
+    background: transparent;
+}
+
+/* Remove list styling */
+ul, ol {
+    padding-left: 1.5rem;
+}
+
+/* Post metadata */
+.meta {
+    color: #666;
+    font-size: 0.9rem;
+}

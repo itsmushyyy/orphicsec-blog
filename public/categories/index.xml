@@ -6,35 +6,6 @@
     <description>Recent content in Categories on orphicsec</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 30 Aug 2018 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Example</title>
-      <link>http://localhost:1313/categories/example/</link>
-      <pubDate>Thu, 30 Aug 2018 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/categories/example/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Bullhorn</title>
-      <link>http://localhost:1313/categories/bullhorn/</link>
-      <pubDate>Mon, 23 Apr 2012 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/categories/bullhorn/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Blog</title>
-      <link>http://localhost:1313/categories/blog/</link>
-      <pubDate>Mon, 12 Mar 2012 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/categories/blog/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Code</title>
-      <link>http://localhost:1313/categories/code/</link>
-      <pubDate>Mon, 23 Jan 2012 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/categories/code/</guid>
-      <description></description>
-    </item>
   </channel>
 </rss>

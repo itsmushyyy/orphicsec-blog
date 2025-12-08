@@ -4,7 +4,7 @@ description: "The personal writings and expressions of Grayfox, otherwise known 
 ---
 <img
   id="foxy"
-  src="/images/mush.jpg"
+  src="/images/mush.png"
   alt="A foxy face"
   width=150>
 

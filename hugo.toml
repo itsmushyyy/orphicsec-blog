@@ -17,26 +17,27 @@ guessSyntax = false
 hl_Lines = ""
 lineAnchors = ""
 lineNoStart = 1
-lineNos = false
-lineNumbersInTable = true
+lineNos = true
+lineNumbersInTable = false
 noClasses = true
-style = "monokai"
+style = "modus-vivendi"
 tabWidth = 4
 
 [permalinks]
 post = "/post/:year/:month/:day/:slug/"
 
 [[menu.main]]
-name = "Categories"
-url = "/categories/"
+name = "Posts"
+url = "/post/"
 weight = 1
 [[menu.main]]
-name = "Tags"
-url = "/tags/"
+name = "About"
+url = "/about/"
 weight = 2
-[[menu.feed]]
-name = "Subscribe"
-url = "/index.xml"
+[[menu.main]]
+name = "Projects"
+url = "/projects/"
+weight = 3
 
 [params]
 custom_css = ["css/theme-override.css"]

@@ -21,28 +21,11 @@
 
   <body>
     <header>
-      <nav>
-        <ul>
-          {{ $title := lower .Title }}
-          {{ $section := lower .Section }}
-          <li class="pull-left {{ if .IsHome }}current{{ end }}">
-            <a href="{{ .Site.BaseURL }}">~/{{ lower .Site.Title}}</a>
-          </li>
-          {{ range .Site.Menus.main }}
-          {{ $name := lower .Name }}
-          <li class="pull-left {{ if eq $name $title }}current{{ else if eq $section $name }}current{{ else if eq $title (pluralize $name) }}current{{ end }}">
-            <a href="{{ .URL }}">~/{{ lower .Name }}</a>
-          </li>
-          {{end}}
-
-          {{ range .Site.Menus.feed }}
-          {{ $name := lower .Name}}
-          <li class="pull-right">
-            <a href="{{ .URL }}">~/{{ lower .Name}}</a>
-          </li>
-          {{end}}
-
-        </ul>
+      <nav style="margin-bottom: 3rem;">
+        <a href="/" style="font-weight: 600; margin-right: 1.5rem;">m u s h y</a>
+        <a href="/post" style="margin-right: 1.5rem;">posts</a>
+        <a href="/about" style="margin-right: 1.5rem;">about</a>
+        <a href="/projects">projects</a>
       </nav>
     </header>
 
