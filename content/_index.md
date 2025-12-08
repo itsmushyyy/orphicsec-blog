@@ -12,7 +12,7 @@ description: "The personal writings and expressions of Grayfox, otherwise known 
 
 ### :blue_heart: :purple_heart: :heart:
 
-Born in a void [somewhere](https://en.wikipedia.org/wiki/Portugal), **mushy** - also known as ~~Miguel Cardoso~~ - I'm just a curious mind doing things on the interwebz. Here, I post rants, think of systems and cry about security.
+Born in a void [somewhere](https://en.wikipedia.org/wiki/Portugal), I'm **orphic** - also known as ~~Miguel Cardoso~~, ~~*mush*~~... - a curious mind doing things on the interwebz. Here, I post rants, think of systems and cry about security.
 
 > *“The lips of Wisdom are closed, except to the ears of Understanding.”*
 
