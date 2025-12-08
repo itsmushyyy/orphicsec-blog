@@ -4,20 +4,20 @@ description: "The personal writings and expressions of Grayfox, otherwise known 
 ---
 <img
   id="foxy"
-  src="/images/mush.png"
+  src="/images/me.png"
   alt="A foxy face"
   width=150>
 
-## Hello, friend
+## hello, friend . . .
 
-### :purple_heart: :earth_africa: :purple_heart:
+### :blue_heart: :purple_heart: :heart:
 
-Born [somewhere](https://en.wikipedia.org/wiki/Portugal), ~~**mush**~~, **mushy** - also known as ~~Miguel~~ - has spent over two decades fiddling with things on the Internet. Here, he just rants.
+Born in a void [somewhere](https://en.wikipedia.org/wiki/Portugal), **mushy** - also known as ~~Miguel Cardoso~~ - I'm just a curious mind doing things on the interwebz. Here, I post rants, think of systems and cry about security.
 
-*“The lips of Wisdom are closed, except to the ears of Understanding.”*
-
-<img src="/images/partywizard.gif">
+> *“The lips of Wisdom are closed, except to the ears of Understanding.”*
 
 ---
+
+<img src="/images/partywizard.gif" width=50>
 
 ## Thoughts & Rants
