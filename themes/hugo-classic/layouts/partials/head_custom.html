@@ -5,3 +5,7 @@
 
 <!-- Custom CSS -->
 <link rel="stylesheet" href="{{ "css/custom.css" | relURL }}">
+
+<!-- SEO meta tags -->
+<meta name="description" content="{{ .Description | default .Site.Params.description }}">
+<meta name="author" content="{{ .Site.Params.author }}">

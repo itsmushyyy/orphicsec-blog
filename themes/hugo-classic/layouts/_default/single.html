@@ -2,14 +2,19 @@
 <div class="article-meta">
     <h1>{{ .Title }}</h1>
     <div style="color: #555; font-size: 0.85rem; margin-bottom: 2rem;">
-       {{ .Date.Format "2006-01-02" }} · {{ .ReadingTime }} min read
+      {{ .Date.Format "2006-01-02" }} · {{ .ReadingTime }} min read
     </div>
 </div>
 
 <div class="content-wrapper">
   <main>
     {{ .Content }}
-    <a href="/"> >> Home</a>
+    <nav style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #1a1a1a; display: flex; justify-content: space-between;">
+      {{ with .PrevInSection }}
+      <a href="{{ .Permalink }}" style="color: #888;">← {{ .Title }}</a>
+      {{ end }}
+      <a href="{{ .Permalink }}" style="color: #888;">{{ .Title }} →</a>
+    </nav>
   </main>
 </div>
 {{ partial "footer.html" . }}

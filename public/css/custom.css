@@ -144,3 +144,24 @@ hr {
 footer {
     margin-top: 4rem;
 }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    body {
+        font-size: 13px;
+        padding: 2rem 1rem;
+        max-width: 100%;
+    }
+    
+    h1 { font-size: 1.3rem; }
+    h2 { font-size: 1.15rem; }
+    
+    nav a {
+        margin-right: 1rem !important;
+    }
+    
+    pre {
+        padding: 0.75rem;
+        font-size: 12px;
+    }
+}

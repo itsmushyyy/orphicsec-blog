@@ -1,5 +1,7 @@
-{{ partial "header.html" . }}
-
-404 - You once were found. But now you're lost.
-
-{{ partial "footer.html" . }}
+{{ define "main" }}
+<main style="text-align: center; padding: 4rem 0;">
+  <h1>404</h1>
+  <p style="color: #666;">Page not found</p>
+  <a href="/" style="color: #888; margin-top: 2rem; display: inline-block;">← Home</a>
+</main>
+{{ end }}
