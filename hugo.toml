@@ -27,17 +27,21 @@ tabWidth = 4
 post = "/post/:year/:month/:day/:slug/"
 
 [[menu.main]]
-name = "Posts"
+name = "post"
 url = "/post/"
 weight = 1
 [[menu.main]]
-name = "About"
+name = "about"
 url = "/about/"
 weight = 2
 [[menu.main]]
-name = "Projects"
+name = "projects"
 url = "/projects/"
 weight = 3
+[[menu.main]]
+name = "ctf"
+url = "/ctf/"
+weight = 4
 
 [params]
 custom_css = ["css/theme-override.css"]

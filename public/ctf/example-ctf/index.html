@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Lord of Order and Chaos">
+    <title>HTB - Editor | orphicsec</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="http://localhost:1313/css/theme-override.css">
+    
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta name="description" content="Lord of Order and Chaos">
+<meta name="author" content="">
+
+  </head>
+
+  <body>
+<header>
+    <nav style="margin-bottom: 3rem;">
+        <a href="/" style="font-weight: 600; margin-right: 1.5rem;">~</a>
+        <a href="/post" style="margin-right: 1.5rem;">posts</a>
+        <a href="/ctf" style="margin-right: 1.5rem;">ctf</a>
+        <a href="/projects" style="margin-right: 1.5rem;">projects</a>
+        <a href="/about">whoami</a>
+    </nav>
+</header>
+
+
+<div class="article-meta">
+    <h1>HTB - Editor</h1>
+    <div style="color: #555; font-size: 0.85rem; margin-bottom: 2rem;">
+      2024-12-08 · 3 min read
+    </div>
+</div>
+
+<div class="content-wrapper">
+  <main>
+    <p>| <strong>OS:</strong> Linux</p>
+<p>| <strong>Difficulty:</strong> Easy [20]</p>
+<p>| <strong>Season:</strong> 9</p>
+<hr>
+<p><strong>Editor</strong> is a Linux box hosting a code editor website, with documentation on an XWiki instance. I’ll exploit a vulnerability in XWiki’s Solr search that allows unauthenticated Groovy script injection to get remote code execution and a shell. From there, I’ll find database credentials in the XWiki Hibernate config and pivot to a user who reuses the password. Enumerating localhost services, I’ll find NetData running an older version that installs a vulnerable ndsudo SetUID binary that is vulnerable to PATH injection, which I’ll abuse to get root.</p>
+<h1 id="recon">Recon</h1>
+<h2 id="initial-scanning">Initial Scanning</h2>
+<p><code>nmap</code> finds three open TCP ports, SSH (22) and two HTTP (80, 8080):</p>
+<div class="highlight"><pre tabindex="0" style="color:#fff;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span>oxdf@hacky$ nmap -p- -vvv --min-rate <span style="color:#00bcff">10000</span> 10.10.11.80
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>Starting Nmap 7.94SVN <span style="color:#00d3d0">(</span> https://nmap.org <span style="color:#00d3d0">)</span> at 2025-08-09 18:01 UTC
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>...<span style="color:#00d3d0">[</span>snip<span style="color:#00d3d0">]</span>...
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>Nmap scan report <span style="color:#b6a0ff">for</span> 10.10.11.80
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>Host is up, received echo-reply ttl <span style="color:#00bcff">63</span> <span style="color:#00d3d0">(</span>0.12s latency<span style="color:#00d3d0">)</span>.
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>Scanned at 2025-08-09 18:01:57 UTC <span style="color:#b6a0ff">for</span> 16s
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>Not shown: <span style="color:#00bcff">65532</span> closed tcp ports <span style="color:#00d3d0">(</span>reset<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>PORT     STATE SERVICE    REASON
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>22/tcp   open  ssh        syn-ack ttl <span style="color:#00bcff">63</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>80/tcp   open  http       syn-ack ttl <span style="color:#00bcff">63</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>8080/tcp open  http-proxy syn-ack ttl <span style="color:#00bcff">63</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>Read data files from: /usr/bin/../share/nmap
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>Nmap <span style="color:#b6a0ff">done</span>: <span style="color:#00bcff">1</span> IP address <span style="color:#00d3d0">(</span><span style="color:#00bcff">1</span> host up<span style="color:#00d3d0">)</span> scanned in 16.11 seconds
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>           Raw packets sent: <span style="color:#00bcff">153968</span> <span style="color:#00d3d0">(</span>6.775MB<span style="color:#00d3d0">)</span> | Rcvd: <span style="color:#00bcff">105117</span> <span style="color:#00d3d0">(</span>4.205MB<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>oxdf@hacky$ nmap -p 22,80,8080 -sCV 10.10.11.80
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>Starting Nmap 7.94SVN <span style="color:#00d3d0">(</span> https://nmap.org <span style="color:#00d3d0">)</span> at 2025-08-09 18:06 UTC
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>Nmap scan report <span style="color:#b6a0ff">for</span> 10.10.11.80
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>Host is up <span style="color:#00d3d0">(</span>0.089s latency<span style="color:#00d3d0">)</span>.
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span>PORT     STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.13 <span style="color:#00d3d0">(</span>Ubuntu Linux; protocol 2.0<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>| ssh-hostkey:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>|   <span style="color:#00bcff">256</span> 3e:ea:45:4b:c5:d1:6d:6f:e2:d4:d1:3b:0a:3d:a9:4f <span style="color:#00d3d0">(</span>ECDSA<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span>|_  <span style="color:#00bcff">256</span> 64:cc:75:de:4a:e6:a5:b4:73:eb:3f:1b:cf:b4:e3:94 <span style="color:#00d3d0">(</span>ED25519<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span>80/tcp   open  http    nginx 1.18.0 <span style="color:#00d3d0">(</span>Ubuntu<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span>|_http-server-header: nginx/1.18.0 <span style="color:#00d3d0">(</span>Ubuntu<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span>|_http-title: Did not follow redirect to http://editor.htb/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span>8080/tcp open  http    Jetty 10.0.20
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span>| http-methods:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span>|_  Potentially risky methods: PROPFIND LOCK UNLOCK
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span><span>|_http-server-header: Jetty<span style="color:#00d3d0">(</span>10.0.20<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span><span>| http-webdav-scan:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span>|   Allowed Methods: OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span><span>|   Server Type: Jetty<span style="color:#00d3d0">(</span>10.0.20<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span><span>|_  WebDAV type: Unknown
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span><span>| http-title: XWiki - Main - Intro
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span><span>|_Requested resource was http://10.10.11.80:8080/xwiki/bin/view/Main/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span><span>| http-cookie-flags:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span><span>|   /:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span><span>|     JSESSIONID:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span><span>|_      httponly flag not <span style="color:#f78fe7">set</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span><span>| http-robots.txt: <span style="color:#00bcff">50</span> disallowed entries <span style="color:#00d3d0">(</span><span style="color:#00bcff">15</span> shown<span style="color:#00d3d0">)</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span><span>| /xwiki/bin/viewattachrev/ /xwiki/bin/viewrev/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span><span>| /xwiki/bin/pdf/ /xwiki/bin/edit/ /xwiki/bin/create/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span><span>| /xwiki/bin/inline/ /xwiki/bin/preview/ /xwiki/bin/save/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span><span>| /xwiki/bin/saveandcontinue/ /xwiki/bin/rollback/ /xwiki/bin/deleteversions/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span><span>| /xwiki/bin/cancel/ /xwiki/bin/delete/ /xwiki/bin/deletespace/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span><span>|_/xwiki/bin/undelete/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span><span>|_http-open-proxy: Proxy might be redirecting requests
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span><span>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span><span>Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span><span>Nmap <span style="color:#b6a0ff">done</span>: <span style="color:#00bcff">1</span> IP address <span style="color:#00d3d0">(</span><span style="color:#00bcff">1</span> host up<span style="color:#00d3d0">)</span> scanned in 11.63 seconds
+</span></span></code></pre></div><p>Based on the <a href="https://0xdf.gitlab.io/cheatsheets/os#ubuntu">OpenSSH and nginx</a> versions, the host is likely running Ubuntu 22.04 jammy [LTS].</p>
+<p>All of the ports show a TTL of 63, which matches the <a href="https://0xdf.gitlab.io/cheatsheets/os#os-identification">expected TTL</a> for Linux one hop away.</p>
+<p>The website on port 80 is redirecting to <code>editor.htb</code>.</p>
+<h2 id="subdomain-brute-force">Subdomain Brute Force</h2>
+<p>Given the use of domain name based routing and the domain <code>editor.htb</code>, I’ll check for subdomains that respond differently than the default case using <code>ffuf</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#fff;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span>oxdf@hacky$ ffuf -u http://10.10.11.80 -H <span style="color:#79a8ff">&#34;Host: FUZZ.editor.htb&#34;</span> -w /opt/SecLists/Discovery/DNS/subdomains-top1million-20000.txt -ac
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>        /<span style="color:#79a8ff">&#39;___\  /&#39;</span>___<span style="color:#79a8ff">\ </span>          /&#39;___<span style="color:#79a8ff">\ </span>      
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>       /<span style="color:#79a8ff">\ \_</span>_/ /<span style="color:#79a8ff">\ \_</span>_/  __  __  /<span style="color:#79a8ff">\ \_</span>_/       
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>       <span style="color:#79a8ff">\ \ </span>,__<span style="color:#79a8ff">\\</span> <span style="color:#79a8ff">\ </span>,__<span style="color:#79a8ff">\/\ \/\ \ \ \ </span>,__<span style="color:#79a8ff">\ </span>     
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>        <span style="color:#79a8ff">\ \ \_</span>/ <span style="color:#79a8ff">\ \ \_</span>/<span style="color:#79a8ff">\ \ \_\ \ \ \ \_</span>/      
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>         <span style="color:#79a8ff">\ \_\ </span>  <span style="color:#79a8ff">\ \_\ </span> <span style="color:#79a8ff">\ \_</span>___/  <span style="color:#79a8ff">\ \_\ </span>      
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>          <span style="color:#79a8ff">\/</span>_/    <span style="color:#79a8ff">\/</span>_/   <span style="color:#79a8ff">\/</span>___/    <span style="color:#79a8ff">\/</span>_/       
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>       v2.1.0-dev
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>________________________________________________
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span> :: Method           : GET
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span> :: URL              : http://10.10.11.80
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span> :: Wordlist         : FUZZ: /opt/SecLists/Discovery/DNS/subdomains-top1million-20000.txt
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span> :: Header           : Host: FUZZ.editor.htb
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span> :: Follow redirects : <span style="color:#f78fe7">false</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span> :: Calibration      : <span style="color:#f78fe7">true</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span> :: Timeout          : <span style="color:#00bcff">10</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span> :: Threads          : <span style="color:#00bcff">40</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span> :: Matcher          : Response status: 200-299,301,302,307,401,403,405,500
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>________________________________________________
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>wiki                    <span style="color:#00d3d0">[</span>Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 93ms<span style="color:#00d3d0">]</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span>:: Progress: <span style="color:#00d3d0">[</span>19966/19966<span style="color:#00d3d0">]</span> :: Job <span style="color:#00d3d0">[</span>1/1<span style="color:#00d3d0">]</span> :: <span style="color:#00bcff">447</span> req/sec :: Duration: <span style="color:#00d3d0">[</span>0:00:45<span style="color:#00d3d0">]</span> :: Errors: <span style="color:#00bcff">0</span> ::
+</span></span></code></pre></div>
+    <nav style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #1a1a1a; display: flex; justify-content: space-between;">
+      
+      <a href="http://localhost:1313/ctf/example-ctf/" style="color: #888;">HTB - Editor →</a>
+    </nav>
+  </main>
+</div>
+<footer>
+    <hr style="border: 0; border-top: 1px solid #222; margin: 3rem 0 1rem;">
+    <p style="color: #444; font-size: 0.85rem;">mushy © 2025</p>
+</footer>
+  </body>
+</html>
+

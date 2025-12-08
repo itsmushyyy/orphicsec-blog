@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ctfs on orphicsec</title>
+    <link>http://localhost:1313/ctf/</link>
+    <description>Recent content in Ctfs on orphicsec</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 08 Dec 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/ctf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>HTB - Editor</title>
+      <link>http://localhost:1313/ctf/example-ctf/</link>
+      <pubDate>Sun, 08 Dec 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/ctf/example-ctf/</guid>
+      <description>&lt;p&gt;| &lt;strong&gt;OS:&lt;/strong&gt; Linux&lt;/p&gt;&#xA;&lt;p&gt;| &lt;strong&gt;Difficulty:&lt;/strong&gt; Easy [20]&lt;/p&gt;&#xA;&lt;p&gt;| &lt;strong&gt;Season:&lt;/strong&gt; 9&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;&lt;strong&gt;Editor&lt;/strong&gt; is a Linux box hosting a code editor website, with documentation on an XWiki instance. I’ll exploit a vulnerability in XWiki’s Solr search that allows unauthenticated Groovy script injection to get remote code execution and a shell. From there, I’ll find database credentials in the XWiki Hibernate config and pivot to a user who reuses the password. Enumerating localhost services, I’ll find NetData running an older version that installs a vulnerable ndsudo SetUID binary that is vulnerable to PATH injection, which I’ll abuse to get root.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
