@@ -114,7 +114,17 @@ img {
     margin: 2rem 0;
 }
 
-/* Tables */
+/* Tables - force dark */
+table,
+table tbody,
+table thead,
+table tr,
+table td,
+table th {
+    background: #000000 !important;
+    background-color: #000000 !important;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -126,11 +136,22 @@ td, th {
     padding: 0.5rem;
     border: 1px solid #222;
     text-align: left;
+    color: #c0c0c0;
 }
 
 th {
-    background: #0a0a0a;
+    background: #0a0a0a !important;
     font-weight: 600;
+    color: #ffffff;
+}
+
+/* Nuclear option - kill all row backgrounds */
+tr:nth-child(odd),
+tr:nth-child(even),
+tbody tr:nth-child(odd),
+tbody tr:nth-child(even) {
+    background: #000000 !important;
+    background-color: #000000 !important;
 }
 
 /* Horizontal rule */

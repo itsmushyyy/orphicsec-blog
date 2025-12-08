@@ -1,0 +1,23 @@
+@import url('https://rsms.me/inter/inter.css');
+html { font-family:
+        'JetBrains Mono',
+        'IBM Plex Mono',
+        'SF Mono',
+        'Consolar',
+        monospace;
+        font-size: 15px;
+      }
+@supports (font-variation-settings: normal) {
+  html { font-family:
+        'JetBrains Mono',
+        'IBM Plex Mono',
+        'SF Mono',
+        'Consolar',
+        monospace;
+        }
+}
+
+code {
+  font-family: 'Consolas', 'Monaco', monospace;   
+  font-size: 85%;
+}
