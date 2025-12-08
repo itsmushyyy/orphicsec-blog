@@ -10,7 +10,7 @@ description: "The personal writings and expressions of Grayfox, otherwise known 
 
 ## hello, friend . . .
 
-### :blue_heart: :purple_heart: :heart:
+### :detective: :black_heart:
 
 Born in a void [somewhere](https://en.wikipedia.org/wiki/Portugal), I'm **orphic** - also known as ~~Miguel Cardoso~~, ~~*mush*~~... - a curious mind doing things on the interwebz. Here, I post rants, think of systems and cry about security.
 
